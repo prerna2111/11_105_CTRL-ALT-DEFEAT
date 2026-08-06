@@ -9,22 +9,6 @@ pipeline {
 
     stages {
 
-        stage('Debug Docker') {
-            steps {
-                sh '''
-                    whoami
-                    pwd
-
-                    which docker || true
-                    which docker-compose || true
-
-                    docker --version || true
-                    docker compose version || true
-                    docker-compose --version || true
-                '''
-            }
-        } 
-
         stage('Checkout Source') {
             steps {
                 git branch: "${BRANCH}",
@@ -34,25 +18,25 @@ pipeline {
 
         stage('Stop Existing Containers') {
             steps {
-                sh 'docker compose down --remove-orphans || true'
+                sh 'docker-compose down || true'
             }
         }
 
         stage('Build Docker Images') {
             steps {
-                sh 'docker compose build --pull --no-cache'
+                sh 'docker-compose build --no-cache'
             }
         }
 
         stage('Deploy') {
             steps {
-                sh 'docker compose up -d'
+                sh 'docker-compose up -d'
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                sh 'docker compose ps'
+                sh 'docker-compose ps'
                 sh 'docker ps'
             }
         }
