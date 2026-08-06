@@ -9,6 +9,22 @@ pipeline {
 
     stages {
 
+        stage('Debug Docker') {
+            steps {
+                sh '''
+                    whoami
+                    pwd
+
+                    which docker || true
+                    which docker-compose || true
+
+                    docker --version || true
+                    docker compose version || true
+                    docker-compose --version || true
+                '''
+            }
+        } 
+
         stage('Checkout Source') {
             steps {
                 git branch: "${BRANCH}",
