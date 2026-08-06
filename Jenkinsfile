@@ -16,37 +16,43 @@ pipeline {
             }
         }
 
-
         stage('Stop Existing Containers') {
             steps {
-                dir('backend') {
-                    sh 'docker-compose down || true'
-                }
+                sh 'docker compose down --remove-orphans || true'
             }
         }
 
-        
-
-        stage('Build Docker Image') {
+        stage('Build Docker Images') {
             steps {
-                dir('backend') {
-                    sh 'docker-compose build --no-cache'
-                }
+                sh 'docker compose build --pull --no-cache'
             }
         }
 
         stage('Deploy') {
             steps {
-                dir('backend') {
-                    sh 'docker-compose up -d'
-                }
+                sh 'docker compose up -d'
             }
         }
 
-        stage('Verify') {
+        stage('Verify Deployment') {
             steps {
+                sh 'docker compose ps'
                 sh 'docker ps'
             }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker image prune -f || true'
+        }
+
+        success {
+            echo 'Deployment completed successfully.'
+        }
+
+        failure {
+            echo 'Deployment failed.'
         }
     }
 }
